@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  seq:
+    image: datalust/seq:latest
+
+  redis:
+    image: redis:alpine
+    
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    volumes:
+        - "rabbitmq_data:/data"
+
+  admin.api:
+    image: ${DOCKER_REGISTRY-}adminapi
+    build:
+      context: .
+      dockerfile: Services/Admin/Admin.API/Dockerfile
+    depends_on:
+      - redis
+      - rabbitmq
+
+  profile.api:
+    image: ${DOCKER_REGISTRY-}profileapi
+    build:
+      context: .
+      dockerfile: Services/Profile/Profile.API/Dockerfile
+    depends_on:
+      - redis
+      - rabbitmq
+volumes:
+  rabbitmq_data:
+
